@@ -1,0 +1,1 @@
+ตรวจสอบสิทธิ์การใช้งานฟอนต์ LINE Seed Sans TH และ dependency/CDN ตามเงื่อนไขของเจ้าของสิทธิ์ก่อนเผยแพร่ Production

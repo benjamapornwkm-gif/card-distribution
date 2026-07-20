@@ -1,0 +1,218 @@
+<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>บันทึกการกระจายบัตร Demo V7</title>
+<style>@font-face{font-family:'LINE Seed Sans TH';src:url('https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/LINESeedSansTH/LINESeedSansTH_W_Rg.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'LINE Seed Sans TH';src:url('https://cdn.jsdelivr.net/gh/lazywasabi/thai-web-fonts@7/fonts/LINESeedSansTH/LINESeedSansTH_W_Bd.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
+
+*{box-sizing:border-box}body{margin:0;font-family:'LINE Seed Sans TH','Noto Sans Thai',Tahoma,sans-serif;background:#F8FAFC;color:#1D2939}header{background:#101828;color:#fff;padding:15px 24px;display:flex;justify-content:space-between;align-items:center}nav button{border:0;background:none;color:#d0d5dd;padding:10px;cursor:pointer}nav .active{color:#fff;border-bottom:2px solid #84adff}main{max-width:1400px;margin:22px auto;padding:0 16px}.page{display:none}.page.active{display:block}.card{background:#fff;border:1px solid #E4E7EC;border-radius:12px;padding:16px;margin-bottom:14px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.kpi{cursor:pointer}.kpi b{font-size:27px;display:block;margin-top:8px}.muted{color:#667085;font-size:12px}.btn{border:0;border-radius:8px;padding:10px 14px;cursor:pointer}.primary{background:#2563EB;color:#fff}.secondary{background:#EFF6FF;color:#1D4ED8}.danger{background:#fff1f0;color:#b42318}.field label{display:block;font-size:12px;font-weight:bold;margin-bottom:6px}input,select{width:100%;border:1px solid #d0d5dd;border-radius:7px;padding:10px;background:#fff}.invalid{border-color:#d92d20!important;background:#fff1f0!important;box-shadow:0 0 0 1px #d92d20}.err{min-height:15px;color:#d92d20;font-size:11px;margin-top:4px}.row{display:grid;grid-template-columns:2.3fr 1fr 1.2fr 1.2fr 1.5fr auto;gap:10px;align-items:start}.item{border:1px solid #E4E7EC;border-radius:10px;padding:13px;margin:10px 0}.itemhead{font-weight:bold;margin-bottom:10px}.searchwrap{position:relative}.results{position:absolute;z-index:20;top:64px;left:0;right:0;max-height:220px;overflow:auto;background:#fff;border:1px solid #d0d5dd;border-radius:8px;display:none;box-shadow:0 8px 20px #0002}.opt{padding:9px;border-bottom:1px solid #f2f4f7;cursor:pointer}.opt:hover{background:#eff6ff}.qtydetail{font-size:11px;background:#f2f4f7;padding:7px;border-radius:6px;margin-top:5px}.seal{display:flex;gap:5px}.seal input:first-child{width:42%}.seal input:last-child{width:58%}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e4e7ec;text-align:left;font-size:13px}th{background:#f9fafb}.badge{background:#ecfdf3;color:#027a48;padding:4px 7px;border-radius:99px;font-size:11px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.modal{display:none;position:fixed;inset:0;background:#0007;z-index:50;align-items:center;justify-content:center}.modalbox{width:min(650px,94vw);max-height:90vh;overflow:auto;background:#fff;border-radius:12px;padding:20px}
+@media(max-width:1000px){.row{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.row,.grid{grid-template-columns:1fr}}
+
+nav button{font-family:inherit;font-weight:600}.card{box-shadow:0 1px 3px rgba(16,24,40,.04)}
+.kpi{transition:.18s ease}.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(16,24,40,.08)}
+.kpi b{font-weight:700;letter-spacing:-.4px}.btn,input,select,button{font-family:inherit}
+h1,h2,h3{letter-spacing:-.25px}.primary:hover{background:#1D4ED8}
+table th{font-weight:600;color:#344054}table tbody tr:hover{background:#F8FAFC}
+
+.status-wait{background:#FFF7E6!important;color:#B54708!important}
+.status-transit{background:#EFF6FF!important;color:#175CD3!important}
+.status-arrived{background:#ECFDF3!important;color:#027A48!important}
+.status-return{background:#FEF3F2!important;color:#B42318!important}
+.filterbar{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;margin-bottom:12px}
+.return-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.return-summary>div{background:#F8FAFC;border:1px solid #E4E7EC;border-radius:9px;padding:12px}
+@media(max-width:800px){.filterbar,.return-summary{grid-template-columns:1fr}}
+</style></head><body>
+<header><b>📦 บันทึกการกระจายบัตร</b><nav><button class="active" onclick="page('dash',this)">Dashboard</button><button onclick="page('add',this)">บันทึกการกระจาย</button><button onclick="page('hist',this)">ประวัติ</button><button onclick="page('returnPage',this)">Update</button><button onclick="page('master',this)">Master Data</button></nav></header>
+<main>
+<section id="dash" class="page active"><h2>Dashboard การกระจายบัตร</h2><div class="grid">
+<div class="card kpi"><span class="muted">บัตรกระจายทั้งหมด</span><b id="k1">0</b><span class="muted">ใบ</span></div><div class="card kpi"><span class="muted">ศูนย์ที่ได้รับแล้ว</span><b id="k2">0</b><span class="muted">ศูนย์</span></div><div class="card kpi"><span class="muted">จำนวนเที่ยวขนส่ง</span><b id="k3">0</b><span class="muted">เที่ยว</span></div><div class="card kpi"><span class="muted">ถึงศูนย์แล้ว</span><b id="k4">0</b><span class="muted">รายการ</span></div></div>
+<div class="card"><div class="toolbar"><div><h3 style="margin:0">ยอดสะสมแยกตามศูนย์</h3><span class="muted">ค้นหาและกดหัวตารางเพื่อเรียงได้</span></div><input id="dashSearch" style="max-width:340px" placeholder="ค้นหารหัส / ชื่อศูนย์" oninput="renderDash()"></div><table><thead><tr><th>ศูนย์</th><th>จำนวนครั้ง</th><th>บัตรสะสม</th><th>ครั้งล่าสุด</th></tr></thead><tbody id="dashRows"></tbody></table></div></section>
+
+<section id="add" class="page"><h2>บันทึกการกระจายบัตร</h2><div class="muted" style="margin-bottom:12px">1 วันเพิ่มได้หลายศูนย์ • Seal Lock ไม่บังคับกรอก • ขั้นต่ำ 500 ใบ/ศูนย์</div>
+<div class="card"><div class="field" style="max-width:330px"><label>วันที่กระจาย *</label><input id="distDate" type="date"><div class="err"></div></div><h3>รายการศูนย์ที่กระจาย</h3><div id="items"></div>
+<button class="btn secondary" onclick="addItem()">+ เพิ่มรายการศูนย์</button><div class="card" style="background:#f9fafb;margin-top:14px;display:flex;justify-content:space-between"><b>รวมทั้งหมด</b><b><span id="grand">0</span> ใบ</b></div><button class="btn primary" onclick="saveAll()">บันทึกทั้งหมด</button></div></section>
+
+<section id="hist" class="page"><div class="toolbar"><h2>ประวัติการกระจาย</h2><input id="histSearch" style="max-width:340px" placeholder="ค้นหา..." oninput="renderHistory()"></div><div class="card" style="overflow:auto"><table><thead><tr><th>วันที่</th><th>ศูนย์</th><th>จำนวน</th><th>เที่ยวรถ</th><th>ทะเบียน</th><th>Seal Lock</th><th>สถานะ</th><th>รูป</th></tr></thead><tbody id="histRows"></tbody></table></div></section>
+<section id="master" class="page"><h2>Master Data ศูนย์</h2><div class="card"><input id="masterSearch" placeholder="ค้นหารหัส / ชื่อศูนย์" oninput="renderMaster()" style="margin-bottom:10px"><table><thead><tr><th>รหัส</th><th>ชื่อศูนย์</th></tr></thead><tbody id="masterRows"></tbody></table></div></section>
+
+<section id="returnPage" class="page">
+<div class="toolbar"><div><h2 style="margin-bottom:4px">Update การจัดส่ง</h2><div class="muted">อัปเดตผลการจัดส่งแต่ละศูนย์ • ถึงแล้วหรือยัง • มีบัตรส่งคืนหรือไม่</div></div></div>
+<div class="card">
+<div class="filterbar"><input id="retMainSearch" placeholder="🔍 ค้นหาศูนย์ / Seal Lock / ทะเบียน..." oninput="renderReturnMain()">
+<select id="retMainStatus" onchange="renderReturnMain()"><option value="">ทุกสถานะ</option><option value="รอจัดส่ง">รอจัดส่ง</option><option value="อยู่ระหว่างขนส่ง">อยู่ระหว่างขนส่ง</option><option value="ถึงศูนย์แล้ว">ถึงศูนย์แล้ว</option><option value="มีส่งคืน">มีส่งคืน</option></select>
+<select id="retMainSort" onchange="renderReturnMain()"><option value="new">วันที่ล่าสุด</option><option value="remainDesc">จำนวนมาก→น้อย</option></select>
+<button class="btn secondary" onclick="retMainSearch.value='';retMainStatus.value='';renderReturnMain()">ล้าง</button></div>
+<div style="overflow:auto"><table><thead><tr><th>วันที่</th><th>ศูนย์</th><th>กระจายไป</th><th>เที่ยวรถ</th><th>ทะเบียน</th><th>Seal Lock</th><th>สถานะ</th><th>ส่งคืน</th><th>รับสุทธิ</th><th>จัดการ</th></tr></thead><tbody id="returnMainRows"></tbody></table></div>
+</div></section>
+</main>
+
+
+
+<div id="detailModal" class="modal"><div class="modalbox">
+<div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">รายละเอียดการกระจาย</h3><button class="btn secondary" onclick="detailModal.style.display='none'">ปิด</button></div>
+<div id="detailBody" style="margin-top:16px"></div>
+</div></div>
+<div id="returnModal" class="modal"><div class="modalbox">
+<h3>Update การจัดส่ง</h3><div id="returnModalTitle" style="font-weight:bold;margin-bottom:4px"></div><div id="returnModalInfo" class="muted" style="margin-bottom:14px"></div>
+<div class="return-summary"><div><span class="muted">กระจายไป</span><b id="rmSent" style="display:block;font-size:20px"></b></div><div><span class="muted">ส่งคืนสะสม</span><b id="rmReturned" style="display:block;font-size:20px"></b></div><div><span class="muted">รับสุทธิ</span><b id="rmRemain" style="display:block;font-size:20px"></b></div></div>
+<div class="field"><label>สถานะการจัดส่ง *</label><select id="upStatus" onchange="toggleUpdateFields()"><option>รอจัดส่ง</option><option>อยู่ระหว่างขนส่ง</option><option>ถึงศูนย์แล้ว</option></select><div class="err"></div></div>
+<div id="arrivalFields" style="display:none">
+<div class="grid" style="margin-top:10px"><div class="field"><label>วันที่ถึงศูนย์ *</label><input id="upArrivalDate" type="date"><div class="err"></div></div><div class="field"><label>รูปหลักฐานถึงศูนย์ *</label><input id="upArrivalPhoto" type="file" accept="image/*"><div class="err"></div></div></div>
+<div class="field" style="margin-top:10px"><label>มีบัตรส่งคืนหรือไม่? *</label><select id="upHasReturn" onchange="toggleReturnFields()"><option value="no">ไม่มีส่งคืน</option><option value="yes">มีส่งคืน</option></select><div class="err"></div></div>
+<div id="updateReturnFields" style="display:none">
+<div class="field" style="margin-top:10px"><label>จำนวนส่งคืน *</label><input id="rmQty" type="number" min="500" step="500" placeholder="เช่น 1500" oninput="rmQtyDetail.textContent=breakdown(this.value)"><div id="rmQtyDetail" class="qtydetail">0 ใบ</div><div class="err"></div></div>
+<div class="field" style="margin-top:10px"><label>สาเหตุ *</label><select id="rmReason"><option value="">-- เลือกสาเหตุ --</option><option>บัตรชำรุด</option><option>บัตรเกินความต้องการ</option><option>ศูนย์ปิด/ย้ายจุดบริการ</option><option>จัดส่งผิดศูนย์</option><option>อื่น ๆ</option></select><div class="err"></div></div>
+<div class="field" style="margin-top:10px"><label>รายละเอียดเพิ่มเติม</label><input id="rmNote" placeholder="ระบุรายละเอียด..."><div class="err"></div></div>
+<div class="field" style="margin-top:10px"><label>รูปหลักฐานการส่งคืน *</label><input id="rmPhoto" type="file" accept="image/*"><div class="err"></div></div>
+</div></div>
+<div style="margin-top:15px"><button class="btn primary" onclick="saveUpdateDelivery()">บันทึก Update</button> <button class="btn secondary" onclick="returnModal.style.display='none'">ยกเลิก</button></div>
+</div></div>
+<div id="editModal" class="modal"><div class="modalbox"><h3>อัปเดตรายการ</h3><div id="editTitle" style="font-weight:bold;margin-bottom:12px"></div>
+<div class="field"><label>สถานะ *</label><select id="editStatus"><option>รอจัดส่ง</option><option>อยู่ระหว่างขนส่ง</option><option>ถึงศูนย์แล้ว</option></select><div class="err"></div></div>
+<div class="field" style="margin-top:10px"><label>Seal Lock (เพิ่มภายหลังได้)</label><div class="seal"><input id="editPrefix" value="G05" readonly tabindex="-1"><input id="editSeal" placeholder="4 หลักหลัง" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4);checkSealDuplicate(this)"></div><div class="err"></div></div>
+<div class="field" style="margin-top:10px"><label>แนบรูปเมื่อสินค้าถึง</label><input id="editPhoto" type="file" accept="image/*"><div class="err"></div><div id="photoInfo" class="muted"></div></div>
+<div style="margin-top:15px"><button class="btn primary" onclick="saveEdit()">บันทึกการอัปเดต</button> <button class="btn secondary" onclick="closeEdit()">ยกเลิก</button></div></div></div>
+
+<datalist id="trips"><option>เที่ยวที่ 1</option><option>เที่ยวที่ 2</option><option>เที่ยวที่ 3</option><option>เที่ยวที่ 4</option><option>เที่ยวที่ 5</option><option>เที่ยวที่ 6</option><option>เที่ยวที่ 7</option><option>เที่ยวที่ 8</option><option>เที่ยวที่ 9</option><option>เที่ยวที่ 10</option><option>เที่ยวที่ 11</option><option>เที่ยวที่ 12</option><option>เที่ยวที่ 13</option><option>เที่ยวที่ 14</option><option>เที่ยวที่ 15</option><option>จัดส่งเอง</option></datalist>
+<script>
+const centers=[{"code": "BKK-SC-M-002", "name": "01-ศูนย์บริการฯ กทม.1 (สจก.2)"}, {"code": "BKK-SC-M-003", "name": "02-ศูนย์บริการฯ กทม.2 (สจก.5)"}, {"code": "BKK-SC-M-001", "name": "03-ศูนย์บริการวีซ่าและใบอนุญาตฯ"}, {"code": "BKK-SC-S-004", "name": "04-ศูนย์บริการฯ กทม.3 (สจก.3)"}, {"code": "BKK-SC-S-003", "name": "05-ศูนย์บริการฯ กทม.4 (สจก.7)"}, {"code": "BKK-SC-S-001", "name": "06-ศูนย์บริการฯ กทม.5 (สจก.9)"}, {"code": "BKK-SC-S-002", "name": "07-ศูนย์บริการฯ กทม.6 (สจก.10)"}, {"code": "SKN-SC-L-001", "name": "08-ศูนย์บริการฯ จังหวัดสมุทรสาคร"}, {"code": "NPT-SC-M-001", "name": "09-ศูนย์บริการฯ จังหวัดนครปฐม"}, {"code": "SPK-SC-M-001", "name": "10-ศูนย์บริการฯ จังหวัดสมุทรปราการ"}, {"code": "PTE-SC-M-001", "name": "11-ศูนย์บริการฯ จังหวัดปทุมธานี"}, {"code": "NBI-SC-M-001", "name": "12-ศูนย์บริการฯ จังหวัดนนทบุรี"}, {"code": "CBI-SC-M-001", "name": "13-ศูนย์บริการฯ จังหวัดชลบุรี"}, {"code": "SNI-SC-M-001", "name": "14-ศูนย์บริการฯ จังหวัดสุราษฎร์ธานี"}, {"code": "CMI-SC-M-001", "name": "15-ศูนย์บริการฯ จังหวัดเชียงใหม่"}, {"code": "RYG-SC-S-001", "name": "16-ศูนย์บริการฯ จังหวัดระยอง"}, {"code": "RBR-SC-S-001", "name": "17-ศูนย์บริการฯ จังหวัดราชบุรี"}, {"code": "CCO-SC-S-001", "name": "18-ศูนย์บริการฯ จังหวัดฉะเชิงเทรา"}, {"code": "CTI-SC-S-001", "name": "19-ศูนย์บริการฯ จังหวัดจันทบุรี"}, {"code": "AYA-SC-S-001", "name": "20-ศูนย์บริการฯ จังหวัดพระนครศรีอยุธยา"}, {"code": "PKN-SC-S-001", "name": "21-ศูนย์บริการฯ จังหวัดประจวบคีรีขันธ์"}, {"code": "KRI-SC-S-001", "name": "22-ศูนย์บริการฯ จังหวัดกาญจนบุรี"}, {"code": "SRI-SC-S-001", "name": "23-ศูนย์บริการฯ จังหวัดสระบุรี"}, {"code": "PRI-SC-S-001", "name": "24-ศูนย์บริการฯ จังหวัดปราจีนบุรี"}, {"code": "TRT-SC-S-001", "name": "25-ศูนย์บริการฯ จังหวัดตราด"}, {"code": "PBI-SC-S-001", "name": "26-ศูนย์บริการฯ จังหวัดเพชรบุรี"}, {"code": "SPB-SC-S-001", "name": "27-ศูนย์บริการฯ จังหวัดสุพรรณบุรี"}, {"code": "PKT-SC-S-001", "name": "28-ศูนย์บริการฯ จังหวัดภูเก็ต"}, {"code": "SKA-SC-S-001", "name": "29-ศูนย์บริการฯ จังหวัดสงขลา"}, {"code": "CPN-SC-S-001", "name": "30-ศูนย์บริการฯ จังหวัดชุมพร"}, {"code": "RNG-SC-S-001", "name": "31-ศูนย์บริการฯ จังหวัดระนอง"}, {"code": "PNA-SC-S-001", "name": "32-ศูนย์บริการฯ จังหวัดพังงา"}, {"code": "NST-SC-S-001", "name": "33-ศูนย์บริการฯ จังหวัดนครศรีธรรมราช"}, {"code": "TAK-SC-S-001", "name": "34-ศูนย์บริการฯ จังหวัดตาก"}, {"code": "CRI-SC-S-001", "name": "35-ศูนย์บริการฯ จังหวัดเชียงราย"}, {"code": "PRE-SC-S-001", "name": "36-ศูนย์บริการฯ จังหวัดแพร่"}, {"code": "NMA-SC-S-001", "name": "37-ศูนย์บริการฯ จังหวัดนครราชสีมา"}, {"code": "KKN-SC-S-001", "name": "38-ศูนย์บริการฯ จังหวัดขอนแก่น"}, {"code": "UBN-SC-S-001", "name": "39-ศูนย์บริการฯ จังหวัดอุบลราชธานี"}, {"code": "CBI-SC-S-001", "name": "40-ศูนย์บริการฯ EEC จ.ชลบุรี"}, {"code": "TAK-OB-L-001", "name": "41-ศูนย์แรกรับฯ จังหวัดตาก"}, {"code": "MDH-OB-M-001", "name": "42-ศูนย์แรกรับฯ จังหวัดมุกดาหาร"}, {"code": "RNG-OB-M-001", "name": "43-ศูนย์แรกรับฯ จังหวัดระนอง"}, {"code": "SKW-OB-L-001", "name": "44-ศูนย์แรกรับฯ จังหวัดสระแก้ว"}, {"code": "NKI-OB-L-001", "name": "45-ศูนย์แรกรับฯ จังหวัดหนองคาย"}, {"code": "FTS-SC-S-001", "name": "46-ศูนย์กำกับย่อย"}, {"code": "MB-001", "name": "47-Mobile Unit - 1 (กลาง)"}, {"code": "MB-002", "name": "48-Mobile Unit - 2 (เหนือบน เชียงใหม่)"}, {"code": "MB-003", "name": "49-Mobile Unit - 3 (เหนือล่าง ตาก)"}, {"code": "MB-004", "name": "51-Mobile Unit - 5 (อีสานตอนบน หนองคาย)"}, {"code": "MB-005", "name": "50-Mobile Unit - 4 (อีสานกลาง ขอนแก่น)"}, {"code": "MB-006", "name": "52-Mobile Unit - 6 (ใต้ สงขลา)"}, {"code": "MB-007", "name": "53-Mobile Unit - 7 (กลาง)"}, {"code": "MB-008", "name": "54-Mobile Unit - 8 (กลาง)"}, {"code": "TAK-SC-S-002", "name": "ตาก (สาขาศูนย์แรกรับ)"}, {"code": "NKI-SC-S-001", "name": "หนองคาย (สาขาศูนย์แรกรับ)"}, {"code": "RNG-SC-S-002", "name": "ระนอง (สาขาศูนย์แรกรับ)"}];
+let records=JSON.parse(localStorage.getItem('distV7')||'[]'), seq=0, editing=null;
+function page(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderAll()}
+function addItem(){
+ seq++;let d=document.createElement('div');d.className='item';d.innerHTML=`<div class="itemhead">รายการที่ <span class="no"></span></div><div class="row">
+ <div class="field searchwrap"><label>1. ศูนย์ที่กระจาย *</label><input class="cs" placeholder="พิมพ์รหัสหรือชื่อศูนย์..." autocomplete="off" oninput="findCenter(this)" onfocus="findCenter(this)"><input class="cc" type="hidden"><div class="results"></div><div class="err"></div></div>
+ <div class="field"><label>2. จำนวนบัตร *</label><input class="qty" type="number" min="500" step="100" placeholder="ขั้นต่ำ 500" oninput="qtyChange(this)"><div class="qtydetail">0 ใบ</div><div class="err"></div></div>
+ <div class="field"><label>3. เที่ยวรถ *</label><input class="trip" list="trips" placeholder="เที่ยวที่ 1-15" oninput="tripChange(this)"><div class="err"></div></div>
+ <div class="field"><label>4. ทะเบียนรถ *</label><input class="reg" placeholder="เช่น 1กข 1234" oninput="clearErr(this)"><div class="err"></div></div>
+ <div class="field"><label>5. Seal Lock (ไม่บังคับ)</label><div class="seal"><input class="pre" value="G05" readonly tabindex="-1" aria-label="Seal Lock Prefix"><input class="s4" placeholder="กรอก 4 หลัก" maxlength="4" inputmode="numeric" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"></div><div class="err"></div></div>
+ <button class="btn danger" style="margin-top:18px" onclick="removeItem(this)">ลบ</button></div>`;
+ items.appendChild(d);renumber();updateTotal();
+}
+function removeItem(b){if(document.querySelectorAll('.item').length===1){alert('ต้องมีอย่างน้อย 1 รายการ');return}b.closest('.item').remove();renumber();updateTotal()}
+function renumber(){document.querySelectorAll('.item').forEach((x,i)=>x.querySelector('.no').textContent=i+1)}
+function findCenter(inp){clearErr(inp);let q=inp.value.toLowerCase(),box=inp.parentElement.querySelector('.results');let a=centers.filter(c=>(c.code+' '+c.name).toLowerCase().includes(q)).slice(0,25);box.innerHTML=a.map(c=>`<div class="opt" data-code="${esc(c.code)}" data-name="${esc(c.name)}" onclick="pickCenter(this)"><b>${esc(c.name)}</b><br><span class="muted">${esc(c.code)}</span></div>`).join('');box.style.display=a.length?'block':'none'}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function pickCenter(o){let f=o.closest('.field');f.querySelector('.cs').value=o.dataset.name;f.querySelector('.cc').value=o.dataset.code;f.querySelector('.results').style.display='none'}
+function breakdown(n){n=+n||0;if(!n)return'0 ใบ';let c=Math.floor(n/1500),rem=n%1500,b=Math.floor(rem/500);rem%=500;let p=Math.floor(rem/100),pcs=rem%100,parts=[];if(c)parts.push(c+' Carton');if(b)parts.push(b+' Box');if(p)parts.push(p+' Pack');if(pcs)parts.push(pcs+' pcs');let eq=(n>=1500&&n%500===0)?` = ${Math.floor(n/500)} Box`:'';return`${n.toLocaleString()} ใบ = ${parts.join(' + ')}${eq}`}
+function qtyChange(i){clearErr(i);i.parentElement.querySelector('.qtydetail').textContent=breakdown(i.value);if(+i.value>0&&+i.value<500)setErr(i,'ขั้นต่ำ 500 ใบ');updateTotal()}
+function tripChange(i){clearErr(i);let it=i.closest('.item'),r=it.querySelector('.reg');if(i.value==='จัดส่งเอง'){r.value='';r.disabled=true;r.placeholder='ไม่ต้องกรอก'}else{r.disabled=false;r.placeholder='เช่น 1กข 1234';let same=[...document.querySelectorAll('.item')].find(x=>x!==it&&x.querySelector('.trip').value===i.value&&x.querySelector('.reg').value);if(same)r.value=same.querySelector('.reg').value}}
+function setErr(i,m){i.classList.add('invalid');let e=i.closest('.field').querySelector('.err');if(e)e.textContent=m}function clearErr(i){i.classList.remove('invalid');let e=i.closest('.field')?.querySelector('.err');if(e)e.textContent=''}
+function bad(i,m){setErr(i,m);i.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>i.focus(),200);return false}
+function updateTotal(){grand.textContent=[...document.querySelectorAll('.qty')].reduce((s,x)=>s+(+x.value||0),0).toLocaleString()}
+
+function checkSealDuplicate(inp){
+ clearErr(inp);
+ if(inp.value.length!==4)return true;
+ let items=[...document.querySelectorAll('.item')], current=inp.closest('.item'), currentNo=items.indexOf(current)+1;
+ let dup=items.find((it,idx)=>it!==current && it.querySelector('.s4').value===inp.value);
+ if(dup){
+   let dupNo=items.indexOf(dup)+1;
+   setErr(inp,`Seal Lock G05-${inp.value} ซ้ำกับรายการที่ ${dupNo} ในรอบการกระจายนี้`);
+   return false;
+ }
+ // Warn if used in saved history, but do not block current-round validation.
+ let old=records.find(r=>r.seal===`G05-${inp.value}`);
+ if(old){
+   let e=inp.closest('.field').querySelector('.err');
+   if(e){e.style.color='#b54708';e.textContent=`คำเตือน: G05-${inp.value} เคยใช้วันที่ ${old.date} (${old.center})`;}
+ } else {
+   let e=inp.closest('.field').querySelector('.err'); if(e)e.style.color='';
+ }
+ return true;
+}
+function validate(){clearErr(distDate);if(!distDate.value)return bad(distDate,'กรุณาเลือกวันที่');for(let it of document.querySelectorAll('.item')){let c=it.querySelector('.cs'),q=it.querySelector('.qty'),t=it.querySelector('.trip'),r=it.querySelector('.reg'),pre=it.querySelector('.pre'),s=it.querySelector('.s4');[c,q,t,r,pre,s].forEach(clearErr);if(!c.value.trim())return bad(c,'กรุณาเลือกศูนย์');if(!q.value)return bad(q,'กรุณากรอกจำนวน');if(+q.value<500)return bad(q,'ขั้นต่ำ 500 ใบ');if(+q.value%100!==0)return bad(q,'จำนวนต้องเป็นหน่วยละ 100 ใบ');if(!t.value.trim())return bad(t,'กรุณาเลือกเที่ยวรถ');if(t.value!=='จัดส่งเอง'&&!r.value.trim())return bad(r,'กรุณากรอกทะเบียนรถ');if(s.value && s.value.length!==4)return bad(s,'กรุณากรอกเลข Seal Lock 4 หลัก เช่น G05-1234');if(s.value.length===4&&!checkSealDuplicate(s))return bad(s,s.closest('.field').querySelector('.err').textContent)}return true}
+function saveAll(){if(!validate())return;document.querySelectorAll('.item').forEach(it=>{let pre=it.querySelector('.pre').value.toUpperCase(),s=it.querySelector('.s4').value,t=it.querySelector('.trip').value;records.push({date:distDate.value,center:it.querySelector('.cs').value,code:it.querySelector('.cc').value,qty:+it.querySelector('.qty').value,trip:t,reg:t==='จัดส่งเอง'?'จัดส่งเอง':it.querySelector('.reg').value,seal:s?'G05-'+s:'',status:'รอจัดส่ง',photo:false})});localStorage.setItem('distV7',JSON.stringify(records));alert('บันทึกเรียบร้อย');items.innerHTML='';addItem();renderAll()}
+function renderHistory(){let q=(histSearch.value||'').toLowerCase();histRows.innerHTML=records.map((r,i)=>({...r,i})).filter(r=>JSON.stringify(r).toLowerCase().includes(q)).reverse().map(r=>`<tr style="cursor:pointer" onclick="openDetail(${r.i})"><td>${r.date}</td><td>${r.center}</td><td>${r.qty.toLocaleString()}<div class="muted">${breakdown(r.qty)}</div></td><td>${r.trip}</td><td>${r.reg||'-'}</td><td>${r.seal||'<span style="color:#b54708">รอข้อมูล</span>'}</td><td><span class="badge ${statusClass(r.status)}">${r.status}</span></td><td>${r.photo?'📷 ดูรูป':'-'}</td></tr>`).join('')||'<tr><td colspan="8">ยังไม่มีข้อมูล</td></tr>'}
+function openEdit(i){editing=i;let r=records[i];editTitle.textContent=r.center+' • '+r.qty.toLocaleString()+' ใบ';editStatus.value=r.status;let a=(r.seal||'').split('-');editPrefix.value='G05';editSeal.value=a[1]||'';editPhoto.value='';photoInfo.textContent=r.photo?'มีรูปหลักฐานแล้ว':'ยังไม่มีรูป';editModal.style.display='flex'}
+function closeEdit(){editModal.style.display='none';editing=null}
+function saveEdit(){let r=records[editing],p=editPrefix.value.toUpperCase().trim(),s=editSeal.value.trim();if(s&&s.length!==4)return bad(editSeal,'กรอกเลข Seal Lock ให้ครบ 4 หลัก');if(editStatus.value==='ถึงศูนย์แล้ว'&&!r.photo&&!editPhoto.files.length)return bad(editPhoto,'ถึงศูนย์แล้ว กรุณาแนบรูปหลักฐาน');r.status=editStatus.value;r.seal=s?'G05-'+s:'';if(editPhoto.files.length)r.photo=true;localStorage.setItem('distV7',JSON.stringify(records));closeEdit();renderAll();alert('อัปเดตเรียบร้อย')}
+function renderDash(){let map={},q=(dashSearch.value||'').toLowerCase();records.forEach(r=>{if(!map[r.center])map[r.center]={code:r.code,qty:0,n:0,last:''};map[r.center].qty+=r.qty;map[r.center].n++;if(r.date>map[r.center].last)map[r.center].last=r.date});let a=Object.entries(map).filter(([n,v])=>(n+' '+v.code).toLowerCase().includes(q)).sort((a,b)=>b[1].qty-a[1].qty);k1.textContent=records.reduce((s,r)=>s+r.qty,0).toLocaleString();k2.textContent=Object.keys(map).length;k3.textContent=new Set(records.map(r=>r.date+'|'+r.trip)).size;k4.textContent=records.filter(r=>r.status==='ถึงศูนย์แล้ว').length;dashRows.innerHTML=a.map(([n,v])=>`<tr><td>${n}<div class="muted">${v.code}</div></td><td>${v.n}</td><td><b>${v.qty.toLocaleString()}</b><div class="muted">${breakdown(v.qty)}</div></td><td>${v.last}</td></tr>`).join('')||'<tr><td colspan="4">ยังไม่มีข้อมูล</td></tr>'}
+function renderMaster(){let q=(masterSearch.value||'').toLowerCase();masterRows.innerHTML=centers.filter(c=>(c.code+' '+c.name).toLowerCase().includes(q)).map(c=>`<tr><td>${c.code}</td><td>${c.name}</td></tr>`).join('')}
+function renderAll(){renderDash();renderHistory();renderMaster()}document.addEventListener('click',e=>{if(!e.target.closest('.searchwrap'))document.querySelectorAll('.results').forEach(x=>x.style.display='none')});
+distDate.value=new Date().toISOString().slice(0,10);addItem();renderAll();
+
+let returns=JSON.parse(localStorage.getItem('returnsV12')||'[]');
+function statusClass(s){return s==='ถึงศูนย์แล้ว'?'status-arrived':s==='อยู่ระหว่างขนส่ง'?'status-transit':s==='มีส่งคืน'?'status-return':'status-wait'}
+function populateReturnRecords(){
+ if(!document.getElementById('returnRecord'))return;
+ let cur=returnRecord.value;
+ returnRecord.innerHTML='<option value="">-- เลือกรายการ --</option>'+records.map((r,i)=>`<option value="${i}">${r.date} • ${r.center} • ${r.qty.toLocaleString()} ใบ</option>`).join('');
+ returnRecord.value=cur;
+}
+function loadReturnRecord(){
+ let i=returnRecord.value;if(i===''){returnForm.style.display='none';return}
+ let r=records[+i], already=returns.filter(x=>x.recordIndex==+i).reduce((s,x)=>s+x.qty,0);
+ retSent.textContent=r.qty.toLocaleString()+' ใบ';retSentDetail.textContent=breakdown(r.qty);retAlready.textContent=already.toLocaleString()+' ใบ';retRemain.textContent=(r.qty-already).toLocaleString()+' ใบ';returnForm.style.display='block';updateReturnDetail();
+}
+function updateReturnDetail(){returnQtyDetail.textContent=breakdown(returnQty.value)}
+function saveReturn(){
+ let i=returnRecord.value;if(i==='')return bad(returnRecord,'กรุณาเลือกรายการกระจาย');
+ let r=records[+i],already=returns.filter(x=>x.recordIndex==+i).reduce((s,x)=>s+x.qty,0),q=+returnQty.value;
+ [returnQty,returnReason,returnPhoto].forEach(clearErr);
+ if(!q)return bad(returnQty,'กรุณากรอกจำนวนส่งคืน');
+ if(q<500||q%500!==0)return bad(returnQty,'จำนวนส่งคืนต้องเป็นหน่วย Box ละ 500 ใบ');
+ if(q>r.qty-already)return bad(returnQty,'จำนวนส่งคืนมากกว่าจำนวนคงเหลือที่ศูนย์');
+ if(!returnReason.value)return bad(returnReason,'กรุณาระบุสาเหตุ');
+ if(!returnPhoto.files.length)return bad(returnPhoto,'กรุณาแนบรูปหลักฐาน');
+ returns.push({recordIndex:+i,date:new Date().toISOString().slice(0,10),center:r.center,sent:r.qty,qty:q,reason:returnReason.value,note:returnNote.value,photo:true});
+ r.status='มีส่งคืน';localStorage.setItem('returnsV12',JSON.stringify(returns));localStorage.setItem('distV7',JSON.stringify(records));
+ alert('บันทึกการส่งคืนเรียบร้อย');returnQty.value='';returnReason.value='';returnNote.value='';returnPhoto.value='';loadReturnRecord();renderAll();renderReturns();
+}
+function renderReturns(){
+ if(!document.getElementById('returnRows'))return;
+ let q=(retSearch.value||'').toLowerCase(),rf=retReasonFilter.value,a=returns.filter(x=>(x.center+' '+x.reason+' '+(x.note||'')).toLowerCase().includes(q)&&(!rf||x.reason===rf));
+ if(retSort.value==='qtydesc')a.sort((x,y)=>y.qty-x.qty);else if(retSort.value==='qtyasc')a.sort((x,y)=>x.qty-y.qty);else a=a.slice().reverse();
+ returnRows.innerHTML=a.map(x=>`<tr><td>${x.date}</td><td>${x.center}</td><td>${x.sent.toLocaleString()}<div class="muted">${breakdown(x.sent)}</div></td><td><b>${x.qty.toLocaleString()}</b><div class="muted">${breakdown(x.qty)}</div></td><td>${x.reason}<div class="muted">${x.note||''}</div></td><td>${x.photo?'มีรูป':'-'}</td></tr>`).join('')||'<tr><td colspan="6">ยังไม่มีรายการส่งคืน</td></tr>';
+}
+function clearReturnFilter(){retSearch.value='';retReasonFilter.value='';retSort.value='new';renderReturns()}
+const oldRenderAllV12=renderAll;renderAll=function(){oldRenderAllV12();populateReturnRecords();renderReturns();}
+populateReturnRecords();renderReturns();
+
+let returnEditing=null;
+function returnTotal(i){return returns.filter(x=>x.recordIndex===i).reduce((s,x)=>s+x.qty,0)}
+function returnLatest(i){let a=returns.filter(x=>x.recordIndex===i);return a.length?a[a.length-1]:null}
+function renderReturnMain(){
+ if(!document.getElementById('returnMainRows'))return;
+ let q=(retMainSearch?.value||'').toLowerCase(),st=retMainStatus?.value||'',a=records.map((r,i)=>({r,i,returned:returnTotal(i),latest:returnLatest(i)}));
+ a=a.filter(x=>(x.r.center+' '+(x.r.seal||'')+' '+(x.r.reg||'')).toLowerCase().includes(q));
+ if(st==='none')a=a.filter(x=>!x.returned);if(st==='returned')a=a.filter(x=>x.returned>0);
+ if(retMainSort?.value==='remainDesc')a.sort((x,y)=>(y.r.qty-y.returned)-(x.r.qty-x.returned));else if(retMainSort?.value==='returnDesc')a.sort((x,y)=>y.returned-x.returned);else a.reverse();
+ returnMainRows.innerHTML=a.map(x=>`<tr>
+ <td>${x.r.date}</td><td><b>${x.r.center}</b><div class="muted">${x.r.code||''}</div></td>
+ <td><b>${x.r.qty.toLocaleString()}</b><div class="muted">${breakdown(x.r.qty)}</div></td><td>${x.r.trip||'-'}</td><td>${x.r.reg||'-'}</td><td>${x.r.seal||'รอข้อมูล'}</td>
+ <td>${x.latest?`<b>${x.latest.qty.toLocaleString()}</b><div class="muted">${breakdown(x.latest.qty)}</div>`:'-'}</td>
+ <td><b>${x.returned.toLocaleString()}</b></td><td><b>${(x.r.qty-x.returned).toLocaleString()}</b><div class="muted">${breakdown(x.r.qty-x.returned)}</div></td>
+ <td>${x.r.qty-x.returned>0?`<button class="btn secondary" onclick="openReturnModal(${x.i})">บันทึกคืน</button>`:'<span class="badge status-return">คืนครบแล้ว</span>'}</td></tr>`).join('')||'<tr><td colspan="10">ไม่พบข้อมูล</td></tr>';
+}
+function openReturnModal(i){returnEditing=i;let r=records[i],rt=returnTotal(i);returnModalTitle.textContent=r.center;returnModalInfo.textContent=`${r.date} • ${r.trip||'-'} • ${r.reg||'-'} • ${r.seal||'รอ Seal Lock'}`;rmSent.textContent=r.qty.toLocaleString()+' ใบ';rmReturned.textContent=rt.toLocaleString()+' ใบ';rmRemain.textContent=(r.qty-rt).toLocaleString()+' ใบ';rmQty.value='';rmQtyDetail.textContent='0 ใบ';rmReason.value='';rmNote.value='';rmPhoto.value='';returnModal.style.display='flex'}
+function saveReturnModal(){let i=returnEditing,r=records[i],already=returnTotal(i),q=+rmQty.value;[rmQty,rmReason,rmPhoto].forEach(clearErr);if(!q)return bad(rmQty,'กรุณากรอกจำนวนคืน');if(q<500||q%500!==0)return bad(rmQty,'จำนวนคืนต้องเป็นหน่วย Box ละ 500 ใบ');if(q>r.qty-already)return bad(rmQty,'จำนวนคืนเกินจำนวนคงเหลือ');if(!rmReason.value)return bad(rmReason,'กรุณาเลือกสาเหตุ');if(!rmPhoto.files.length)return bad(rmPhoto,'กรุณาแนบรูปหลักฐาน');returns.push({recordIndex:i,date:new Date().toISOString().slice(0,10),center:r.center,sent:r.qty,qty:q,reason:rmReason.value,note:rmNote.value,photo:true});r.status='มีส่งคืน';localStorage.setItem('returnsV12',JSON.stringify(returns));localStorage.setItem('distV7',JSON.stringify(records));returnModal.style.display='none';renderAll();renderReturnMain();alert('บันทึกการส่งคืนเรียบร้อย')}
+const renderAllV13=renderAll;renderAll=function(){renderAllV13();renderReturnMain();}
+renderReturnMain();
+
+function toggleUpdateFields(){arrivalFields.style.display=upStatus.value==='ถึงศูนย์แล้ว'?'block':'none';if(upStatus.value!=='ถึงศูนย์แล้ว'){upHasReturn.value='no';updateReturnFields.style.display='none'}}
+function toggleReturnFields(){updateReturnFields.style.display=upHasReturn.value==='yes'?'block':'none'}
+function renderReturnMain(){
+ if(!document.getElementById('returnMainRows'))return;
+ let q=(retMainSearch.value||'').toLowerCase(),st=retMainStatus.value,a=records.map((r,i)=>({r,i,returned:returnTotal(i)})).filter(x=>(x.r.center+' '+(x.r.seal||'')+' '+(x.r.reg||'')).toLowerCase().includes(q));
+ if(st)a=a.filter(x=>x.r.status===st);if(retMainSort.value==='remainDesc')a.sort((x,y)=>y.r.qty-x.r.qty);else a.reverse();
+ returnMainRows.innerHTML=a.map(x=>`<tr><td>${x.r.date}</td><td><b>${x.r.center}</b><div class="muted">${x.r.code||''}</div></td><td><b>${x.r.qty.toLocaleString()}</b><div class="muted">${breakdown(x.r.qty)}</div></td><td>${x.r.trip||'-'}</td><td>${x.r.reg||'-'}</td><td>${x.r.seal||'รอข้อมูล'}</td><td><span class="badge ${statusClass(x.r.status)}">${x.r.status}</span></td><td>${x.returned?`<b>${x.returned.toLocaleString()}</b><div class="muted">${breakdown(x.returned)}</div>`:'-'}</td><td><b>${(x.r.qty-x.returned).toLocaleString()}</b></td><td><button class="btn secondary" onclick="openUpdateDelivery(${x.i})">Update</button></td></tr>`).join('')||'<tr><td colspan="10">ไม่พบข้อมูล</td></tr>';
+}
+function openUpdateDelivery(i){returnEditing=i;let r=records[i],rt=returnTotal(i);returnModalTitle.textContent=r.center;returnModalInfo.textContent=`${r.date} • ${r.trip||'-'} • ${r.reg||'-'} • ${r.seal||'รอ Seal Lock'}`;rmSent.textContent=r.qty.toLocaleString()+' ใบ';rmReturned.textContent=rt.toLocaleString()+' ใบ';rmRemain.textContent=(r.qty-rt).toLocaleString()+' ใบ';upStatus.value=r.status==='มีส่งคืน'?'ถึงศูนย์แล้ว':r.status;upArrivalDate.value=r.arrivalDate||new Date().toISOString().slice(0,10);upHasReturn.value='no';rmQty.value='';rmQtyDetail.textContent='0 ใบ';rmReason.value='';rmNote.value='';upArrivalPhoto.value='';rmPhoto.value='';toggleUpdateFields();toggleReturnFields();returnModal.style.display='flex'}
+function saveUpdateDelivery(){let i=returnEditing,r=records[i];[upStatus,upArrivalDate,upArrivalPhoto,rmQty,rmReason,rmPhoto].forEach(clearErr);if(upStatus.value==='ถึงศูนย์แล้ว'){if(!upArrivalDate.value)return bad(upArrivalDate,'กรุณาระบุวันที่ถึงศูนย์');if(!r.photo&&!upArrivalPhoto.files.length)return bad(upArrivalPhoto,'กรุณาแนบรูปหลักฐานถึงศูนย์');r.arrivalDate=upArrivalDate.value;if(upArrivalPhoto.files.length)r.photo=true;if(upHasReturn.value==='yes'){let already=returnTotal(i),q=+rmQty.value;if(!q)return bad(rmQty,'กรุณากรอกจำนวนส่งคืน');if(q<500||q%500!==0)return bad(rmQty,'จำนวนคืนต้องเป็นหน่วย Box ละ 500 ใบ');if(q>r.qty-already)return bad(rmQty,'จำนวนคืนเกินจำนวนคงเหลือ');if(!rmReason.value)return bad(rmReason,'กรุณาเลือกสาเหตุ');if(!rmPhoto.files.length)return bad(rmPhoto,'กรุณาแนบรูปหลักฐานการส่งคืน');returns.push({recordIndex:i,date:upArrivalDate.value,center:r.center,sent:r.qty,qty:q,reason:rmReason.value,note:rmNote.value,photo:true});r.status='มีส่งคืน'}else r.status='ถึงศูนย์แล้ว'}else r.status=upStatus.value;localStorage.setItem('returnsV12',JSON.stringify(returns));localStorage.setItem('distV7',JSON.stringify(records));returnModal.style.display='none';renderAll();renderReturnMain();alert('อัปเดตเรียบร้อย')}
+
+function openDetail(i){
+ let r=records[i], rt=(typeof returnTotal==='function'?returnTotal(i):0), retItems=(typeof returns!=='undefined'?returns.filter(x=>x.recordIndex===i):[]);
+ let retHtml=retItems.length?`<h4>ประวัติการส่งคืน</h4><table><thead><tr><th>วันที่</th><th>จำนวนคืน</th><th>สาเหตุ</th><th>รายละเอียด</th><th>รูป</th></tr></thead><tbody>${retItems.map(x=>`<tr><td>${x.date}</td><td>${x.qty.toLocaleString()}<div class="muted">${breakdown(x.qty)}</div></td><td>${x.reason}</td><td>${x.note||'-'}</td><td>${x.photo?'มีรูป':'-'}</td></tr>`).join('')}</tbody></table>`:'';
+ detailBody.innerHTML=`<div class="grid">
+ <div><span class="muted">วันที่กระจาย</span><b style="display:block">${r.date}</b></div>
+ <div><span class="muted">ศูนย์</span><b style="display:block">${r.center}</b><span class="muted">${r.code||''}</span></div>
+ <div><span class="muted">จำนวนกระจาย</span><b style="display:block">${r.qty.toLocaleString()} ใบ</b><span class="muted">${breakdown(r.qty)}</span></div>
+ <div><span class="muted">สถานะ</span><div><span class="badge ${statusClass(r.status)}">${r.status}</span></div></div>
+ <div><span class="muted">เที่ยวรถ</span><b style="display:block">${r.trip||'-'}</b></div>
+ <div><span class="muted">ทะเบียน</span><b style="display:block">${r.reg||'-'}</b></div>
+ <div><span class="muted">Seal Lock</span><b style="display:block">${r.seal||'รอข้อมูล'}</b></div>
+ <div><span class="muted">วันที่ถึง</span><b style="display:block">${r.arrivalDate||'-'}</b></div></div>
+ <div class="return-summary"><div><span class="muted">กระจายไป</span><b style="display:block;font-size:20px">${r.qty.toLocaleString()} ใบ</b></div><div><span class="muted">ส่งคืนสะสม</span><b style="display:block;font-size:20px">${rt.toLocaleString()} ใบ</b></div><div><span class="muted">รับสุทธิ</span><b style="display:block;font-size:20px">${(r.qty-rt).toLocaleString()} ใบ</b></div></div>
+ <h4>รูปหลักฐานถึงศูนย์</h4><div class="card" style="background:#F8FAFC">${r.photo?'📷 มีรูปหลักฐาน (เวอร์ชัน Cloud จะเปิดดูไฟล์จาก Google Drive ได้)':'ยังไม่มีรูป'}</div>${retHtml}`;
+ detailModal.style.display='flex';
+}
+</script></body></html>
